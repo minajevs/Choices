@@ -1461,11 +1461,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (newValue.length >= 1 && newValue !== currentValue + ' ') {
 	        var haystack = this.store.getChoicesFilteredBySelectable();
 	        var needle = newValue;
-	        var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
-	        var options = Object.assign(this.config.fuseOptions, { keys: keys });
-	        var fuse = new _fuse2.default(haystack, options);
-	        var results = fuse.search(needle);
-
+          if(this.config.exactSearch){
+            results = haystack.filter(function(x){
+		          return x.indexOf(needle) !== -1;
+	          });
+          } else {
+            var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
+	          options = Object.assign(this.config.fuseOptions, { keys: keys });
+	          fuse = new _fuse2.default(haystack, options);
+	          results = fuse.search(needle);
+          }   
 	        this.currentValue = newValue;
 	        this.highlightPosition = 0;
 	        this.isSearching = true;
