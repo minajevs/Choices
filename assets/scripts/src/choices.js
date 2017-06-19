@@ -65,6 +65,7 @@ class Choices {
       searchChoices: true,
       searchFloor: 1,
       searchFields: ['label', 'value'],
+      exactSearch: false,
       position: 'auto',
       resetScrollPosition: true,
       regexFilter: null,
@@ -1269,11 +1270,17 @@ class Choices {
     if (newValue.length >= 1 && newValue !== `${currentValue} `) {
       const haystack = this.store.getChoicesFilteredBySelectable();
       const needle = newValue;
-      const keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
-      const options = Object.assign(this.config.fuseOptions, { keys });
-      const fuse = new Fuse(haystack, options);
-      const results = fuse.search(needle);
-
+      const results = [];
+      if(this.config.exactSearch){
+        results = haystack.filter(x => {
+		      return x.indexOf(needle) !== -1;
+	      });
+      } else {
+        const keys = isType('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
+        const options = Object.assign(this.config.fuseOptions, { keys });
+        const fuse = new Fuse(haystack, options);
+        results = fuse.search(needle);
+      }
       this.currentValue = newValue;
       this.highlightPosition = 0;
       this.isSearching = true;
